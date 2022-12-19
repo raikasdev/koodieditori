@@ -2,4 +2,37 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 50px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.cmd-wrapper {
+  margin-left: 4ch;
+}
+.terminal {
+  /* 20pt is the total amount of vertical padding */
+  min-height: calc(80vh - 20pt);
+  flex-grow: 1;
+  margin-left: -3ch;
+  padding: 0;
+  padding-bottom: 50vh;
+}
+.console-wrapper {
+  display: flex;
+  flex-direction: row;
+  padding: 10pt;
+}
+.cmd-line {
+  margin-left: -3ch;
+}
+.console-prompt-margin {
+  background-color: transparent;
+  width: 2ch;
+  user-select: none;
+  position: unset;
+  display: flex;
+  flex-direction: column;
+}
+.cmd-prompt {
+  height: 0px !important;
 }

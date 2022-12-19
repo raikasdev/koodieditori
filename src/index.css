@@ -1,4 +1,50 @@
 body {
-  width: 100vw;
-  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
+
+/* Terminal */
+:root {
+  --size: 1.5;
+  --background: transparent;
+  --color: #bbb;
+}
+.cancelled {
+  color: #777 !important;
+}
+body {
+  background: black;
+  margin: 0pt;
+  /* margin-left: 1ch; */
+}
+.cmd-wrapper {
+  margin-left: 4ch;
+}
+.terminal {
+  /* 20pt is the total amount of vertical padding */
+  min-height: calc(100vh - 20pt);
+  flex-grow: 1;
+  margin-left: -3ch;
+  padding: 0;
+  padding-bottom: 50vh;
+}
+.console-wrapper {
+  display: flex;
+  flex-direction: row;
+  padding: 10pt;
+}
+.cmd-line {
+  margin-left: -3ch;
+}
+.console-prompt-margin {
+  z-index: -1;
+  width: 2ch;
+  user-select: none;
+  position: unset;
+  display: flex;
+  flex-direction: column;
+}
+.cmd-prompt {
+  height: 0px !important;
+}
+/* Terminal end */

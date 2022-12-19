@@ -4,15 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js">
-    </script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython_stdlib.js">
-    </script>
+    <title>Koodieditori</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="text/python" id="code_container"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <!--<script type="module">
+      import { term, pyodide, init as initInner } from "./console.js";
+      async function init() {
+        await initInner();
+        window.term = term;
+      }
+      init();
+    </script>-->
   </body>
 </html>
