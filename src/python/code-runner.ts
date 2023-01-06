@@ -11,6 +11,7 @@ import { BackendManager, ProgrammingLanguage } from './backend-manager';
 import { Backend } from './backend';
 import { BackendEvent, BackendEventType } from './backend-event';
 import Logger from '../util/logger';
+import InputServiceWorker from './InputServiceWorker?worker&url';
 
 /**
  * Enum representing the possible states while processing code
@@ -227,10 +228,11 @@ export class CodeRunner {
         return false;
       }
       const serviceWorkerRoot = cleanCurrentUrl(true);
-      const channelOptions = { serviceWorkerUrl: 'InputServiceWorker.js', scope: serviceWorkerRoot };
-      const serviceWorkerUrl = `${serviceWorkerRoot}InputServiceWorker.js`;
+      const channelOptions = { serviceWorkerUrl: InputServiceWorker, scope: serviceWorkerRoot };
+      const serviceWorkerUrl = InputServiceWorker;
       try {
-        await window.navigator.serviceWorker.register(serviceWorkerUrl);
+        // @ts-ignore
+        await navigator.serviceWorker.register(serviceWorkerUrl);
         BackendManager.channel = makeChannel({ serviceWorker: channelOptions })!;
       } catch (error: any) {
         return false;
