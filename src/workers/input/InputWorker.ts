@@ -1,4 +1,5 @@
 import { serviceWorkerFetchListener } from 'sync-message';
+/// <reference lib="webworker" />
 
 /**
  * Class that is used in a service worker to allow synchronous communication

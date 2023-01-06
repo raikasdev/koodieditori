@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
-/// <reference no-default-lib="true"/>
-/// <reference lib="esnext" />
 /// <reference lib="webworker" />
+// LOW PRIORITY: Using sharedarraybuffers anyway
+
 // Import service worker provided by the Papyros-package
 import InputWorker from '../workers/input/InputWorker';
 
@@ -18,7 +18,6 @@ sw.addEventListener('fetch', async (event: FetchEvent) => {
     // Not a Papyros-specific request
     // Fetch as we would handle a normal request
     // Default action is to let browser handle it by not responding here
-
   }
 });
 // Prevent needing to reload page to have working input
