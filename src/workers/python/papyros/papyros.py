@@ -10,7 +10,7 @@ from friendly_traceback.core import FriendlyTraceback
 from collections.abc import Awaitable
 from contextlib import contextmanager, redirect_stdout, redirect_stderr
 from pyodide_worker_runner import install_imports
-from pyodide import JsException, create_proxy
+from pyodide import ffi
 
 from .util import to_py
 from .autocomplete import autocomplete
@@ -30,7 +30,7 @@ class Papyros(python_runner.PyodideRunner):
         if callback is None:
             raise ValueError("Callback must not be None")
         if buffer_constructor is not None:
-            self.OutputBufferClass = lambda f: buffer_constructor(create_proxy(f))
+            self.OutputBufferClass = lambda f: buffer_constructor(ffi.create_proxy(f))
         super().__init__(source_code=source_code, filename=filename)
         self.limit = limit
         self.override_globals()
@@ -95,7 +95,7 @@ class Papyros(python_runner.PyodideRunner):
     async def install_imports(self, source_code, ignore_missing=True):
         try:
             await install_imports(source_code, self.import_callback)
-        except (ValueError, JsException):
+        except (ValueError, ffi.JsException):
             # Notify of import failure
             self.callback("loading", data=dict(status="failed", modules=[]), contentType="application/json")
             # Occurs when trying to fetch PyPi files for misspelled imports

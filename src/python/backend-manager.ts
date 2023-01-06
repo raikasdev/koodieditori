@@ -1,18 +1,18 @@
-import { SyncClient } from "comsync";
-import { BackendEvent, BackendEventType } from "./backend-event";
-import { Channel, makeChannel } from "sync-message";
-import { PyodideClient } from "pyodide-worker-runner";
-import { Backend } from "./backend";
-import PythonWorkerWorker from "../workers/python/PythonWorker.worker?worker";
+import { SyncClient } from 'comsync';
+import { Channel, makeChannel } from 'sync-message';
+import { PyodideClient } from 'pyodide-worker-runner';
+import { BackendEvent, BackendEventType } from './backend-event';
+import { Backend } from './backend';
+import PythonWorkerWorker from '../workers/python/PythonWorker.worker?worker';
+import Logger from '../util/logger';
 
 /**
  * String enum representing programming languages supported by Papyros
  */
 export enum ProgrammingLanguage {
-    Python = "Python",
-    JavaScript = "JavaScript"
+  Python = 'Python',
+  JavaScript = 'JavaScript',
 }
-
 
 /**
  * Callback type definition for subscribers
@@ -29,19 +29,23 @@ export abstract class BackendManager {
      * Map programming languages to Backend constructors
      */
   private static createBackendMap: Map<ProgrammingLanguage, () => SyncClient<Backend>>;
+
   /**
      * Map to cache Backends per ProgrammingLanguage
      */
   private static backendMap: Map<ProgrammingLanguage, SyncClient<Backend>>;
+
   /**
      * Map an event type to interested subscribers
      * Uses an Array to maintain order of subscription
      */
   private static subscriberMap: Map<BackendEventType, Array<BackendEventListener>>;
+
   /**
      * Whether the BackendManager is publishing events
      */
   private static halted: boolean;
+
   /**
      * The channel used to communicate with the SyncClients
      */
@@ -51,8 +55,10 @@ export abstract class BackendManager {
      * @param {ProgrammingLanguage} language The language to support
      * @param {Function} backendCreator The constructor for a SyncClient
      */
-  public static registerBackend(language: ProgrammingLanguage,
-    backendCreator: () => SyncClient<Backend>): void {
+  public static registerBackend(
+    language: ProgrammingLanguage,
+    backendCreator: () => SyncClient<Backend>,
+  ): void {
     BackendManager.removeBackend(language);
     BackendManager.createBackendMap.set(language, backendCreator);
   }
@@ -65,14 +71,13 @@ export abstract class BackendManager {
   public static getBackend(language: ProgrammingLanguage): SyncClient<Backend> {
     if (this.backendMap.has(language)) { // Cached
       return this.backendMap.get(language)!;
-    } else if (this.createBackendMap.has(language)) {
+    } if (this.createBackendMap.has(language)) {
       // Create and then cache
       const syncClient = this.createBackendMap.get(language)!();
       this.backendMap.set(language, syncClient);
       return syncClient;
-    } else {
-      throw new Error(`${language} is not yet supported.`);
     }
+    throw new Error(`${language} is not yet supported.`);
   }
 
   /**
@@ -106,13 +111,12 @@ export abstract class BackendManager {
      * @param {BackendEventType} e The event to publish
      */
   public static publish(e: BackendEvent): void {
-    // TODO: Add custom debug :wow:
-    // papyrosLog(LogType.Debug, "Publishing event: ", e);
+    Logger.log('Publishing event: ', e);
     if (e.type === BackendEventType.Start) {
       BackendManager.halted = false;
     }
     if (!BackendManager.halted && this.subscriberMap.has(e.type)) {
-      this.subscriberMap.get(e.type)!.forEach(cb => cb(e));
+      this.subscriberMap.get(e.type)!.forEach((cb) => cb(e));
     }
   }
 
@@ -128,11 +132,12 @@ export abstract class BackendManager {
     BackendManager.createBackendMap = new Map();
     BackendManager.backendMap = new Map();
     BackendManager.subscriberMap = new Map();
-    BackendManager.registerBackend(ProgrammingLanguage.Python,
+    BackendManager.registerBackend(
+      ProgrammingLanguage.Python,
       () => new PyodideClient<Backend>(
         () => new PythonWorkerWorker(),
-        BackendManager.channel
-      )
+        BackendManager.channel,
+      ),
     );
     BackendManager.halted = false;
     BackendManager.subscribe(BackendEventType.End, () => BackendManager.halt());

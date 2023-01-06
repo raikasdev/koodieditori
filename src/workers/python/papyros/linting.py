@@ -22,7 +22,6 @@ def lint(code):
             "--load-plugins", PYLINT_PLUGINS,
             "--msg-template", "{path}:{line}:{column}:{end_line}:{end_column}:{category}:{msg}",
             tmpf.name], reporter=TextReporter(pylint_output), do_exit=False)
-
     return process_pylint_output(pylint_output.getvalue())
 
 def process_pylint_output(linting_output):

@@ -1,16 +1,18 @@
-import * as Comlink from "comlink";
-import { Backend, RunMode, WorkerAutocompleteContext, WorkerDiagnostic } from "../../python/backend";
-import { CompletionResult } from "@codemirror/autocomplete";
-import { BackendEvent } from "../../python/backend-event";
+import * as Comlink from 'comlink';
+import { CompletionResult } from '@codemirror/autocomplete';
 import {
   pyodideExpose,
   loadPyodideAndPackage,
   PyodideExtras,
-} from "pyodide-worker-runner";
-import { PyodideInterface } from "pyodide";
+} from 'pyodide-worker-runner';
+import { PyodideInterface } from 'pyodide';
+import { BackendEvent } from '../../python/backend-event';
+import {
+  Backend, RunMode, WorkerAutocompleteContext, WorkerDiagnostic,
+} from '../../python/backend';
 
 // @ts-ignore
-import pythonPackageUrl from "./python_package.tar.gz.load_by_url";
+import pythonPackageUrl from './python_package.tar.gz.load_by_url';
 
 /**
  * Implementation of a Python backend for Papyros
@@ -18,11 +20,14 @@ import pythonPackageUrl from "./python_package.tar.gz.load_by_url";
  */
 class PythonWorker extends Backend<PyodideExtras> {
   private pyodide: PyodideInterface;
+
   private papyros: any;
+
   /**
      * Promise to asynchronously install imports needed by the code
      */
   private installPromise: Promise<void> | null;
+
   constructor() {
     super();
     this.pyodide = {} as PyodideInterface;
@@ -41,18 +46,18 @@ class PythonWorker extends Backend<PyodideExtras> {
   }
 
   private static async getPyodide(): Promise<PyodideInterface> {
-    return await loadPyodideAndPackage({ url: pythonPackageUrl, format: ".tgz" });
+    return loadPyodideAndPackage({ url: pythonPackageUrl, format: '.tgz' });
   }
 
   public async launch(
     onEvent: (e: BackendEvent) => void,
-    onOverflow: () => void
+    onOverflow: () => void,
   ): Promise<void> {
     await super.launch(onEvent, onOverflow);
     this.pyodide = await PythonWorker.getPyodide();
     // Python calls our function with a PyProxy dict or a Js Map,
     // These must be converted to a PapyrosEvent (JS Object) to allow message passing
-    this.papyros = this.pyodide.pyimport("papyros").Papyros.callKwargs(
+    this.papyros = this.pyodide.pyimport('papyros').Papyros.callKwargs(
       {
         callback: (e: any) => {
           const converted = PythonWorker.convert(e);
@@ -61,11 +66,11 @@ class PythonWorker extends Backend<PyodideExtras> {
         buffer_constructor: (cb: (e: BackendEvent) => void) => {
           this.queue.setCallback(cb);
           return this.queue;
-        }
-      }
+        },
+      },
     );
     // preload micropip to allow installing packages
-    await (this.pyodide as any).loadPackage("micropip");
+    await (this.pyodide as any).loadPackage('micropip');
   }
 
   /**
@@ -77,8 +82,9 @@ class PythonWorker extends Backend<PyodideExtras> {
       this.installPromise = this.papyros.install_imports.callKwargs(
         {
           source_code: code,
-          ignore_missing: true
-        });
+          ignore_missing: true,
+        },
+      );
     }
     await this.installPromise;
     this.installPromise = null;
@@ -87,14 +93,14 @@ class PythonWorker extends Backend<PyodideExtras> {
   public override runModes(code: string): Array<RunMode> {
     const modes = super.runModes(code);
     modes.push({
-      mode: "doctest",
-      active: this.papyros.has_doctests(code)
+      mode: 'doctest',
+      active: this.papyros.has_doctests(code),
     });
     return modes;
   }
 
-  public override async runCode(extras: PyodideExtras, code: string, mode = "exec"):
-        Promise<any> {
+  public override async runCode(extras: PyodideExtras, code: string, mode = 'exec'):
+  Promise<any> {
     this.extras = extras;
     if (extras.interruptBuffer) {
       this.pyodide.setInterruptBuffer(extras.interruptBuffer);
@@ -102,15 +108,15 @@ class PythonWorker extends Backend<PyodideExtras> {
     await this.installImports(code);
     return await this.papyros.run_async.callKwargs({
       source_code: code,
-      mode: mode
+      mode,
     });
   }
 
   public override async autocomplete(context: WorkerAutocompleteContext):
-        Promise<CompletionResult | null> {
+  Promise<CompletionResult | null> {
     await this.installImports(context.text);
     const result: CompletionResult = PythonWorker.convert(
-      this.papyros.autocomplete(context)
+      this.papyros.autocomplete(context),
     );
     result.validFor = /^[\w$]*$/;
     return result;
