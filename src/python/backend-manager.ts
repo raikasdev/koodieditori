@@ -136,9 +136,7 @@ export abstract class BackendManager {
       BackendManager.registerBackend(
         ProgrammingLanguage.Python,
         () => new PyodideClient<Backend>(
-          () => new Worker(PythonWorkerWorker, {
-            type: 'module',
-          }),
+          () => new Worker(PythonWorkerWorker),
           BackendManager.channel,
         ),
       );

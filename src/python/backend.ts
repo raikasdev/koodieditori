@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
 import { syncExpose, SyncExtras } from 'comsync';
 import { BackendEvent, BackendEventType } from './backend-event';
@@ -122,9 +123,11 @@ export abstract class Backend<Extras extends SyncExtras = SyncExtras> {
       onEvent(e);
       if (e.type === BackendEventType.Sleep) {
         return this.extras.syncSleep(e.data);
-      } if (e.type === BackendEventType.Input) {
+      }
+      if (e.type === BackendEventType.Input) {
         return this.extras.readMessage();
       }
+      return null;
     };
     this.queue = new BackendEventQueue(this.onEvent.bind(this), onOverflow);
     return Promise.resolve();
