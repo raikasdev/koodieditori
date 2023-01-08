@@ -9,8 +9,8 @@ fs.readdir("./dist/assets", (err, files) => {
     flag: "r",
   });
   transform(content, (err, result) => {
-    //const minifyOutput = minify(result.code).code;
-    fs.writeFileSync(`./dist/assets/${file}`, result.code);
+    const minifyOutput = minify(result.code).code;
+    fs.writeFileSync(`./dist/assets/${file}`, minifyOutput);
   });
 });
 
