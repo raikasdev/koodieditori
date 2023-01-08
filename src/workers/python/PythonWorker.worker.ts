@@ -41,6 +41,7 @@ class PythonWorker extends Backend<PyodideExtras> {
   /**
      * @return {any} Function to expose a method with Pyodide support
      */
+  // eslint-disable-next-line class-methods-use-this
   protected override syncExpose(): any {
     return pyodideExpose;
   }
@@ -106,6 +107,7 @@ class PythonWorker extends Backend<PyodideExtras> {
       this.pyodide.setInterruptBuffer(extras.interruptBuffer);
     }
     await this.installImports(code);
+    // eslint-disable-next-line @typescript-eslint/return-await
     return await this.papyros.run_async.callKwargs({
       source_code: code,
       mode,

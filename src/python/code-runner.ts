@@ -11,6 +11,7 @@ import { BackendManager, ProgrammingLanguage } from './backend-manager';
 import { Backend } from './backend';
 import { BackendEvent, BackendEventType } from './backend-event';
 import Logger from '../util/logger';
+
 import InputServiceWorker from './InputServiceWorker?worker&url';
 
 /**

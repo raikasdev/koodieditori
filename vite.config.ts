@@ -5,7 +5,7 @@ import viteIsolation from 'vite-plugin-cross-origin-isolation';
 export default defineConfig({
   plugins: [react(), viteIsolation()],
   assetsInclude: ['**/*.tar.gz.load_by_url'],
-  worker:{
+  worker: {
     format: 'es'
   }
 })

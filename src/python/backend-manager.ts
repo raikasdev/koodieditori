@@ -3,7 +3,7 @@ import { Channel, makeChannel } from 'sync-message';
 import { PyodideClient } from 'pyodide-worker-runner';
 import { BackendEvent, BackendEventType } from './backend-event';
 import { Backend } from './backend';
-import PythonWorkerWorker from '../workers/python/PythonWorker.worker?worker';
+import PythonWorkerWorker from '../workers/python/PythonWorker.worker?worker&url';
 import Logger from '../util/logger';
 
 /**
@@ -132,13 +132,19 @@ export abstract class BackendManager {
     BackendManager.createBackendMap = new Map();
     BackendManager.backendMap = new Map();
     BackendManager.subscriberMap = new Map();
-    BackendManager.registerBackend(
-      ProgrammingLanguage.Python,
-      () => new PyodideClient<Backend>(
-        () => new PythonWorkerWorker(),
-        BackendManager.channel,
-      ),
-    );
+    try {
+      BackendManager.registerBackend(
+        ProgrammingLanguage.Python,
+        () => new PyodideClient<Backend>(
+          () => new Worker(PythonWorkerWorker, {
+            type: 'module',
+          }),
+          BackendManager.channel,
+        ),
+      );
+    } catch (e) {
+      Logger.log('Non supported browser!');
+    }
     BackendManager.halted = false;
     BackendManager.subscribe(BackendEventType.End, () => BackendManager.halt());
     BackendManager.subscribe(BackendEventType.Interrupt, () => BackendManager.halt());

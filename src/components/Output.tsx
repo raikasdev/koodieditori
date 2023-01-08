@@ -49,17 +49,22 @@ function Output() {
   /**
      * Store the HTML that is rendered to restore when changing language/theme
      */
-  const [content, setContent] = useState<OutputLine[]>([]);
+  const [content, setContent] = useState<OutputLine[]>([
+    {
+      type: 'text',
+      value: 'Koodin tuloste ilmestyy tähän.',
+    },
+  ]);
 
+  // TODO: implement overflow
   /**
      * Whether overflow has occurred
      */
-  const [overflown, setOverflown] = useState(false);
+  // const [overflown, setOverflown] = useState(false);
   /**
      * Function to call when the user wants to download overflow results
      */
-  const [downloadCallback, setDownloadCallback] = useState<() => void | null>();
-  const [value, setValue] = useState('Pyytton Konsoli 3.10 ultra hyper max\n\n');
+  // const [downloadCallback, setDownloadCallback] = useState<() => void | null>();
 
   useInit(() => {
     BackendManager.subscribe(BackendEventType.Output, (output) => {
@@ -111,11 +116,11 @@ function Output() {
   return (
     <Text
       sx={{
-        borderRadius: '2px',
+        borderRadius: '5px',
         backgroundColor: '#111',
         width: '100%',
-        height: '500px',
-        overflow: 'scroll',
+        height: '700px',
+        overflowY: 'scroll',
         whiteSpace: 'pre-wrap',
         padding: '0.5rem',
       }}

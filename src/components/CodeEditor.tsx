@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
-import { Button } from '@mantine/core';
+import {
+  Box, Button, Center, Group, Text,
+} from '@mantine/core';
 
 import { lintGutter, lintKeymap, linter } from '@codemirror/lint';
 import {
@@ -26,14 +28,33 @@ import {
 import { EditorState } from '@codemirror/state';
 import { CodeRunner, RunState } from '../python/code-runner';
 
-function CodeEditor({ codeRunner }: { codeRunner: CodeRunner | null }) {
+const transformState = (state: RunState) => {
+  switch (state) {
+    case RunState.Ready:
+      return 'Valmiina suoritettavaksi';
+    case RunState.AwaitingInput:
+      return 'Odottaa syötettä';
+    case RunState.Loading:
+      return 'Ladataan Python-ympäristöä';
+    case RunState.Running:
+      return 'Koodin suoritus kesken';
+    case RunState.Stopping:
+      return 'Sammutetaan';
+    default:
+      return 'Tuntematon tila';
+  }
+};
+
+function CodeEditor(
+  { codeRunner, runState, message }:
+  { codeRunner: CodeRunner | null, runState: RunState, message: string },
+) {
   const [code, setCode] = useState('print("Hello ", input("What\'s your name?"), "!")');
+
   const ref = React.useRef<ReactCodeMirrorRef>();
 
-  if (!codeRunner || codeRunner.lintSource == null || codeRunner.completionSource == null) {
-    return (
-      <>Ladataan koodisuorittajaa</>
-    );
+  if (!codeRunner || !codeRunner?.lintSource || !codeRunner?.completionSource) {
+    return null;
   }
 
   return (
@@ -43,8 +64,6 @@ function CodeEditor({ codeRunner }: { codeRunner: CodeRunner | null }) {
         height="50vh"
         extensions={[
           python(),
-          linter(codeRunner.lintSource),
-          autocompletion({ override: [codeRunner.completionSource] }),
           lintGutter(),
           lineNumbers(),
           highlightSpecialChars(),
@@ -69,18 +88,44 @@ function CodeEditor({ codeRunner }: { codeRunner: CodeRunner | null }) {
             ...lintKeymap,
             indentWithTab,
           ]),
+          linter(codeRunner.lintSource),
+          autocompletion({ override: [codeRunner.completionSource] }),
         ]}
         onChange={(v) => setCode(v)}
         ref={ref as any}
       />
-      <Button
-        color={codeRunner.state === RunState.Ready ? 'green' : 'red'}
-        onClick={() => (codeRunner.state === RunState.Ready
-          ? codeRunner?.runCode(code)
-          : codeRunner.stopCode())}
+      <Box sx={{
+        backgroundColor: '#f5f5f5',
+        borderRadius: '2px',
+        borderTop: '1px solid #ddd',
+        padding: '4px',
+      }}
       >
-        {codeRunner.state === RunState.Ready ? 'Suorita' : 'Pysäytä'}
-      </Button>
+        <Group position="apart">
+          <Button
+            bg={codeRunner?.state === RunState.Ready ? '#2fa3cf' : 'red'}
+            sx={{
+              transitionProperty: 'background-color',
+              transitionDuration: '250ms',
+            }}
+            onClick={() => (codeRunner?.state === RunState.Ready
+              ? codeRunner?.runCode(code)
+              : codeRunner?.stopCode())}
+          >
+            {codeRunner?.state === RunState.Ready ? 'Suorita' : 'Pysäytä'}
+          </Button>
+          <Center>
+            <Text align="right">
+              Tila:
+              {' '}
+              {transformState(runState)}
+              {' '}
+              {message && '| '}
+              {message}
+            </Text>
+          </Center>
+        </Group>
+      </Box>
     </>
   );
 }

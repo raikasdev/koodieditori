@@ -23,7 +23,7 @@ function Input({ codeRunner }: { codeRunner: CodeRunner | null }) {
       label="Syöte"
       value={value}
       disabled={prompt === ''}
-      placeholder={prompt}
+      placeholder={prompt || 'Ohjelma ei pyydä syötettä juuri nyt.'}
       onChange={(e) => setValue(e.currentTarget.value)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' && prompt !== '') {
