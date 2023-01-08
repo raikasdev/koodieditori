@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Text } from '@mantine/core';
+import { Alert, Image, Text } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons';
 import useInit from '../hooks/use-init';
 import { BackendManager } from '../python/backend-manager';
@@ -126,17 +126,37 @@ function Output() {
       }}
     >
       {content.map((i) => {
+        if (i.type === 'image') Logger.log(i.value);
         switch (i.type) {
           case 'text':
             if (i.value === '') return <br key={content.indexOf(i)} />;
             return (
               <Text
-                sx={{ color: i.error ? '#EF4444' : 'white' }}
+                sx={{ color: i.error ? '#EF4444' : 'white', fontFamily: 'monospace' }}
                 key={content.indexOf(i)}
+
               >
                 {i.value}
               </Text>
             );
+          case 'image':
+            if (i.contentType === 'img/svg+xml') {
+              return (
+                <div
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={{ __html: i.value }}
+                />
+              );
+            }
+            return (
+              <Image
+                height={480}
+                width="auto"
+                src={`data:${i.contentType},${i.value}`}
+                alt="Random unsplash image"
+              />
+            );
+
           case 'alert':
             return (
               <div style={{

@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { BackendEvent, BackendEventType } from './backend-event';
 
 /**
@@ -104,6 +105,7 @@ export class BackendEventQueue {
         contentType = extra;
       } else {
         contentType = extra.contentType;
+        // eslint-disable-next-line no-param-reassign
         delete extra.contentType;
         extraArgs = extra;
       }

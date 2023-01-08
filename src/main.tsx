@@ -31,7 +31,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     >
       {isUnsupportedBrowser
         ? <NonSupportedBrowser />
-        : <RouterProvider router={router} />}
+        : (
+          <RouterProvider router={router} />
+        )}
     </div>
   </MantineProvider>,
 );

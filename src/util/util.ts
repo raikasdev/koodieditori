@@ -55,6 +55,8 @@ export function parseData(data: string, contentType?: string): any {
         case 'png;base64': {
           return data;
         }
+        case 'svg+xml':
+          return data;
         default:
           Logger.log(`Unhandled content type: ${contentType}`);
           return data;
@@ -69,4 +71,18 @@ export function parseData(data: string, contentType?: string): any {
       Logger.log(`Unhandled content type: ${contentType}`);
       return data;
   }
+}
+
+export function dateFormat(date: Date) {
+  if (date.getDate() === new Date().getDate()
+  && date.getMonth() === new Date().getMonth()
+  && date.getFullYear() === new Date().getFullYear()) {
+    return `Tänään ${date.toLocaleTimeString('fi', { timeStyle: 'short' })}`;
+  }
+  if (date.getDate() === (new Date().getDate() - 1)
+  && date.getMonth() === new Date().getMonth()
+  && date.getFullYear() === new Date().getFullYear()) {
+    return `Eilen ${date.toLocaleTimeString('fi', { timeStyle: 'short' })}`;
+  }
+  return `${date.toLocaleDateString('fi')} ${date.toLocaleTimeString('fi', { timeStyle: 'short' })}`;
 }

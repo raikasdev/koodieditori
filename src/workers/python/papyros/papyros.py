@@ -5,6 +5,7 @@ import doctest
 import re
 import python_runner
 import friendly_traceback
+import copy
 
 from friendly_traceback.core import FriendlyTraceback
 from collections.abc import Awaitable
@@ -16,6 +17,7 @@ from .util import to_py
 from .autocomplete import autocomplete
 
 SYS_RECURSION_LIMIT = 500
+
 
 class Papyros(python_runner.PyodideRunner):
     def __init__(
@@ -70,6 +72,7 @@ class Papyros(python_runner.PyodideRunner):
         # Otherwise `import matplotlib` fails while assuming a browser backend
         os.environ["MPLBACKEND"] = "AGG"
         self.override_matplotlib()
+        self.override_turtle()
 
     def override_matplotlib(self):
         try:
@@ -89,6 +92,24 @@ class Papyros(python_runner.PyodideRunner):
                 self.output("img", img, contentType="img/png;base64")
 
             matplotlib.pyplot.show = show
+        except ModuleNotFoundError:
+            pass
+
+    def override_turtle(papyros_self):
+        try:
+            # workaround from https://github.com/pyodide/pyodide/issues/1518
+            import turtle
+
+            Screen = turtle.Screen
+
+            def show_scene(self):
+                root = copy.deepcopy(self.end_scene())
+                papyros_self.output("img", turtle.SVG.ET.tostring(root, encoding='utf8', method='xml').decode("utf-8"), contentType="img/svg+xml")
+                self.restart()
+
+            show_scene.__doc__ = Screen.show_scene.__doc__
+
+            Screen.show_scene = show_scene
         except ModuleNotFoundError:
             pass
 

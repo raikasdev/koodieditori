@@ -104,6 +104,7 @@ function CodeEditor(
         <Group position="apart">
           <Button
             bg={codeRunner?.state === RunState.Ready ? '#2fa3cf' : 'red'}
+            color={codeRunner?.state === RunState.Ready ? '' : 'red'}
             sx={{
               transitionProperty: 'background-color',
               transitionDuration: '250ms',
