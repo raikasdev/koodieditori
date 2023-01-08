@@ -21,7 +21,7 @@ const router = createBrowserRouter([
 
 const browser = browserDetect();
 
-const isUnsupportedBrowser = false && browser.name === 'firefox'; // No support for new Worker('', { type: "module" })
+const isUnsupportedBrowser = browser.name === 'firefox'; // No support for new Worker('', { type: "module" })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <MantineProvider withGlobalStyles withNormalizeCSS>
