@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Alert, Image, Text } from '@mantine/core';
+import {
+  Alert, Button, Image, Text,
+} from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons';
 import useInit from '../hooks/use-init';
 import { BackendManager } from '../python/backend-manager';
 import { BackendEventType } from '../python/backend-event';
 import Logger from '../util/logger';
 import { parseData } from '../util/util';
+import { CodeRunner } from '../python/code-runner';
 
 /**
  * Shape of Error objects that are easy to interpret
@@ -45,7 +48,7 @@ type OutputLine = {
   title?: string;
 };
 
-function Output() {
+function Output({ codeRunner }: { codeRunner: CodeRunner | null }) {
   /**
      * Store the HTML that is rendered to restore when changing language/theme
      */
@@ -56,32 +59,27 @@ function Output() {
     },
   ]);
 
-  // TODO: implement overflow
-  /**
-     * Whether overflow has occurred
-     */
-  // const [overflown, setOverflown] = useState(false);
-  /**
-     * Function to call when the user wants to download overflow results
-     */
-  // const [downloadCallback, setDownloadCallback] = useState<() => void | null>();
-
   useInit(() => {
     BackendManager.subscribe(BackendEventType.Output, (output) => {
       const data = parseData(output.data, output.contentType);
-      Logger.log(data.split('\n').map((text: string) => ({ type: 'text', value: text })));
       if (output.contentType && output.contentType.startsWith('img')) {
         setContent((c) => c.concat([{ type: 'image', value: data, contentType: output.contentType }]));
       } else {
         setContent((c) => {
-          const arr = data.split('\n').map((text: string) => ({ type: 'text', value: text }));
-          arr.pop();
-          return c.concat(arr);
+          const arr = data.split(/(\n)/).map((text: string) => ({ type: 'text', value: text }));
+          Logger.log(arr);
+          if (arr.length === 1) {
+            if (c.length === 0) c.push({ type: 'text', value: '' });
+            // eslint-disable-next-line no-param-reassign
+            c[c.length - 1].value += arr[0].value;
+            return [...c];
+          }
+          if (arr[arr.length - 1].value === '') arr.pop();
+          return c.concat(arr.map((i: OutputLine) => (i.value === '\n' ? { type: 'text', value: '' } : i)));
         });
       }
     });
     BackendManager.subscribe(BackendEventType.Error, (error) => {
-      Logger.log('Output got input');
       const errorData = parseData(error.data, error.contentType);
       if (typeof (errorData) === 'string') {
         setContent((c) => c.concat([{ type: 'text', value: errorData }]));
@@ -111,7 +109,6 @@ function Output() {
       setContent([]);
     });
   });
-
   Logger.log(content);
   return (
     <Text
@@ -123,6 +120,8 @@ function Output() {
         overflowY: 'scroll',
         whiteSpace: 'pre-wrap',
         padding: '0.5rem',
+        color: 'white',
+        fontFamily: 'monospace',
       }}
     >
       {content.map((i) => {
@@ -130,15 +129,7 @@ function Output() {
         switch (i.type) {
           case 'text':
             if (i.value === '') return <br key={content.indexOf(i)} />;
-            return (
-              <Text
-                sx={{ color: i.error ? '#EF4444' : 'white', fontFamily: 'monospace' }}
-                key={content.indexOf(i)}
-
-              >
-                {i.value}
-              </Text>
-            );
+            return i.value;
           case 'image':
             if (i.contentType === 'img/svg+xml') {
               return (
@@ -177,6 +168,17 @@ function Output() {
             return null;
         }
       })}
+      {codeRunner?.overflown && (
+        <Text color="red">
+          Tulos katkaistu
+          {codeRunner.overflownAction && (
+          <>
+            <br />
+            <Button onClick={codeRunner.overflownAction}>Lataa tuloste</Button>
+          </>
+          )}
+        </Text>
+      )}
     </Text>
   );
 }

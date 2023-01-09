@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
-  AppShell, Center, Grid, Header, Loader, LoadingOverlay, Navbar, Text,
+  Anchor,
+  AppShell, Center, Grid, Group, Header, Loader, LoadingOverlay, Text,
 } from '@mantine/core';
 
 import { CodeRunner, RunState } from './python/code-runner';
@@ -11,7 +12,7 @@ import Logger from './util/logger';
 import CodeEditor from './components/CodeEditor';
 import Input from './components/Input';
 import Output from './components/Output';
-import FileNavigator from './components/FileNavigator';
+import LogoSVG from './components/Logo';
 
 function App() {
   const [codeRunner, setCodeRunner] = useState<CodeRunner | null>(null);
@@ -45,14 +46,139 @@ function App() {
       header={(
         <Header
           height={50}
-          p="xs"
+          p="sm"
           styles={() => ({
             root: {
               border: '0px',
             },
           })}
         >
-          ohjelmoi.fi v2
+          <Group position="apart" mr="xl">
+            <LogoSVG height="30px" />
+            <Group>
+              <Text color="dimmed" italic sx={{ fontSize: '12px' }}>
+                Beta 2.0.1
+              </Text>
+              <Anchor
+                href="https://testausserveri.fi"
+                sx={{
+                  color: '#1B5E79',
+                  fontFamily: '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
+                  position: 'relative',
+                  '::before': {
+                    content: '""',
+                    position: 'absolute',
+                    width: '100%',
+                    height: '2px',
+                    borderRadius: '2px',
+                    backgroundColor: '#2fa3cf',
+                    bottom: '0',
+                    left: '0',
+                    transformOrigin: 'right',
+                    transform: 'scaleX(0) translate(0%, 100%);',
+                    transition: 'transform .3s ease-in-out',
+                  },
+                  ':hover::before': {
+                    transformOrigin: 'left',
+                    transform: 'scaleX(1) translate(0%, 100%);',
+                  },
+                  ':hover': {
+                    textDecoration: 'none',
+                  },
+                }}
+              >
+                Testausserveri ry
+              </Anchor>
+              {/* <Anchor sx={{
+                color: '#1B5E79',
+                fontFamily:
+                '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",
+                Roboto,"Helvetica Neue",Arial,sans-serif',
+                position: 'relative',
+                '::before': {
+                  content: '""',
+                  position: 'absolute',
+                  width: '100%',
+                  height: '2px',
+                  borderRadius: '2px',
+                  backgroundColor: '#2fa3cf',
+                  bottom: '0',
+                  left: '0',
+                  transformOrigin: 'right',
+                  transform: 'scaleX(0) translate(0%, 100%);',
+                  transition: 'transform .3s ease-in-out',
+                },
+                ':hover::before': {
+                  transformOrigin: 'left',
+                  transform: 'scaleX(1) translate(0%, 100%);',
+                },
+                ':hover': {
+                  textDecoration: 'none',
+                },
+              }}
+              >
+                Palvelusta
+              </Anchor>
+              <Anchor sx={{
+                color: '#1B5E79',
+                fontFamily: '-apple-system,system-ui,BlinkMacSystemFont
+                ,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
+                position: 'relative',
+                '::before': {
+                  content: '""',
+                  position: 'absolute',
+                  width: '100%',
+                  height: '2px',
+                  borderRadius: '2px',
+                  backgroundColor: '#2fa3cf',
+                  bottom: '0',
+                  left: '0',
+                  transformOrigin: 'right',
+                  transform: 'scaleX(0) translate(0%, 100%);',
+                  transition: 'transform .3s ease-in-out',
+                },
+                ':hover::before': {
+                  transformOrigin: 'left',
+                  transform: 'scaleX(1) translate(0%, 100%);',
+                },
+                ':hover': {
+                  textDecoration: 'none',
+                },
+              }}
+              >
+                Kehittäjä
+              </Anchor>
+              <Anchor sx={{
+                color: '#1B5E79',
+                fontFamily: '-apple-system,system-ui,BlinkMacSystemFont
+                ,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
+                position: 'relative',
+                '::before': {
+                  content: '""',
+                  position: 'absolute',
+                  width: '100%',
+                  height: '2px',
+                  borderRadius: '2px',
+                  backgroundColor: '#2fa3cf',
+                  bottom: '0',
+                  left: '0',
+                  transformOrigin: 'right',
+                  transform: 'scaleX(0) translate(0%, 100%);',
+                  transition: 'transform .3s ease-in-out',
+                },
+                ':hover::before': {
+                  transformOrigin: 'left',
+                  transform: 'scaleX(1) translate(0%, 100%);',
+                },
+                ':hover': {
+                  textDecoration: 'none',
+                },
+              }}
+              >
+                Asetukset
+              </Anchor> */}
+            </Group>
+          </Group>
         </Header>
         )}
       styles={(theme) => ({
@@ -77,7 +203,7 @@ function App() {
             <Input codeRunner={codeRunner} />
           </Grid.Col>
           <Grid.Col span={6}>
-            <Output />
+            <Output codeRunner={codeRunner} />
           </Grid.Col>
         </Grid>
 

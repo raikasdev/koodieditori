@@ -6,7 +6,7 @@ import { CompletionSource } from '@codemirror/autocomplete';
 import { LintSource } from '@codemirror/lint';
 import { EditorView } from '@codemirror/view';
 
-import { cleanCurrentUrl, parseData } from '../util/util';
+import { cleanCurrentUrl, parseData, download } from '../util/util';
 import { BackendManager, ProgrammingLanguage } from './backend-manager';
 import { Backend } from './backend';
 import { BackendEvent, BackendEventType } from './backend-event';
@@ -72,6 +72,10 @@ export class CodeRunner {
 
   public lintSource: LintSource | null = null;
 
+  public overflown: boolean = false;
+
+  public overflownAction: (() => void) | null = null;
+
   constructor(
     config: CodeConfig,
     updateState: (newState: RunState) => void,
@@ -124,7 +128,7 @@ export class CodeRunner {
         .launch(
           proxy((e: BackendEvent) => BackendManager.publish(e)),
           proxy(() => {
-            Logger.log('OVERFLOW');
+            this.overflown = true;
           }),
         );
       this.completionSource = (async (context) => {
@@ -158,6 +162,8 @@ export class CodeRunner {
       data: 'StartClicked',
       contentType: 'text/plain',
     });
+    this.overflown = false;
+    this.overflownAction = null;
     this.setState(RunState.Loading);
     this.previousState = RunState.Loading;
     const backend = await this.backend;
@@ -189,16 +195,14 @@ export class CodeRunner {
       if (terminated) {
         await this.start();
       } else if (await backend.workerProxy.hasOverflow()) {
-        Logger.log('Meni yli');
-        /* this.outputManager.onOverflow(async () => {
-          const backend = await this.backend;
+        this.overflown = true;
+        this.overflownAction = async () => {
           const overflowResults = (await backend.workerProxy.getOverflow())
             .map((e) => e.data).join('');
-          downloadResults(
+          download(
             overflowResults,
-            'overflow-results.txt',
           );
-        }); */
+        };
       }
     }
   }

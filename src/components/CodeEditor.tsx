@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import {
-  Box, Button, Center, Group, Text,
+  Box, Button, Center, Group, Select, Text,
 } from '@mantine/core';
 
 import { lintGutter, lintKeymap, linter } from '@codemirror/lint';
@@ -26,7 +26,10 @@ import {
   bracketMatching, foldGutter, foldKeymap, indentOnInput,
 } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
+import { useDebouncedValue } from '@mantine/hooks';
+
 import { CodeRunner, RunState } from '../python/code-runner';
+import examples from '../examples';
 
 const transformState = (state: RunState) => {
   switch (state) {
@@ -49,7 +52,13 @@ function CodeEditor(
   { codeRunner, runState, message }:
   { codeRunner: CodeRunner | null, runState: RunState, message: string },
 ) {
-  const [code, setCode] = useState('print("Hello ", input("What\'s your name?"), "!")');
+  const [code, setCode] = useState(localStorage.getItem('code') || 'print("Hello ", input("What\'s your name?"), "!")');
+
+  const [debounced] = useDebouncedValue(code, 1000);
+
+  useEffect(() => {
+    localStorage.setItem('code', debounced);
+  }, [debounced]);
 
   const ref = React.useRef<ReactCodeMirrorRef>();
 
@@ -115,6 +124,11 @@ function CodeEditor(
           >
             {codeRunner?.state === RunState.Ready ? 'Suorita' : 'Pysäytä'}
           </Button>
+          <Select
+            placeholder="Esimerkit"
+            data={Object.keys(examples).map((i) => ({ value: i, label: i }))}
+            onChange={(value) => (value == null ? null : setCode((examples as any)[value]))}
+          />
           <Center>
             <Text align="right">
               Tila:

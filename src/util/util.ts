@@ -86,3 +86,17 @@ export function dateFormat(date: Date) {
   }
   return `${date.toLocaleDateString('fi')} ${date.toLocaleTimeString('fi', { timeStyle: 'short' })}`;
 }
+
+export function download(data: string) {
+  const blob = new Blob([data], { type: 'text/plain' });
+  const elem = window.document.createElement('a');
+  // Cast URL to any as TypeScript doesn't recognize it properly
+  // error TS2339: Property 'revokeObjectURL' does not exist on type
+  const windowUrl = URL as any;
+  elem.href = windowUrl.createObjectURL(blob);
+  elem.download = 'overflow_results.txt';
+  document.body.appendChild(elem);
+  elem.click();
+  document.body.removeChild(elem);
+  windowUrl.revokeObjectURL(elem.href);
+}
