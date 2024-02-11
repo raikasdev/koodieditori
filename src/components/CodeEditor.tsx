@@ -7,10 +7,14 @@ import {
 
 import { lintGutter, lintKeymap, linter } from '@codemirror/lint';
 import {
-  autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap,
+  autocompletion,
+  closeBrackets,
+  closeBracketsKeymap,
+  completionKeymap,
 } from '@codemirror/autocomplete';
 import {
-  drawSelection, highlightActiveLine,
+  drawSelection,
+  highlightActiveLine,
   highlightActiveLineGutter,
   highlightSpecialChars,
   keymap,
@@ -18,12 +22,18 @@ import {
   rectangularSelection,
 } from '@codemirror/view';
 import {
-  defaultKeymap, history, historyKeymap, indentWithTab,
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
 } from '@codemirror/commands';
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 
 import {
-  bracketMatching, foldGutter, foldKeymap, indentOnInput,
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+  indentOnInput,
 } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { useDebouncedValue } from '@mantine/hooks';
@@ -48,11 +58,19 @@ const transformState = (state: RunState) => {
   }
 };
 
-function CodeEditor(
-  { codeRunner, runState, message }:
-  { codeRunner: CodeRunner | null, runState: RunState, message: string },
-) {
-  const [code, setCode] = useState(localStorage.getItem('code') || 'print("Hello ", input("What\'s your name?"), "!")');
+function CodeEditor({
+  codeRunner,
+  runState,
+  message,
+}: {
+  codeRunner: CodeRunner | null;
+  runState: RunState;
+  message: string;
+}) {
+  const [code, setCode] = useState(
+    localStorage.getItem('code')
+      || 'print("Hello " + input("What\'s your name?") + "!")',
+  );
 
   const [debounced] = useDebouncedValue(code, 1000);
 
@@ -103,12 +121,13 @@ function CodeEditor(
         onChange={(v) => setCode(v)}
         ref={ref as any}
       />
-      <Box sx={{
-        backgroundColor: '#f5f5f5',
-        borderRadius: '2px',
-        borderTop: '1px solid #ddd',
-        padding: '4px',
-      }}
+      <Box
+        sx={{
+          backgroundColor: '#f5f5f5',
+          borderRadius: '2px',
+          borderTop: '1px solid #ddd',
+          padding: '4px',
+        }}
       >
         <Group position="apart">
           <Button
